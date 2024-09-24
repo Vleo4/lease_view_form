@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Filter</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <h1 class="ml-3">Data form</h1>
+    <div>
+        <label for="date-filter" class="ml-3">Filter by Date: </label>
+        <input type="date" id="date-filter" class="">
+        <button onclick="filterData()" class="">Filter</button>
+    </div>
+    <div id="data-display"></div>
+
+    <script>
+        const API_KEY = 'AIzaSyDdz4zQL20nSrv_M4XvzbsIr4I3WA2IVbU';
+        const SHEET_ID = '1tXHxbjHeE2pex8l8k2-68Qzl4dCurIRHaA1FGbNoxmY';
+        const SHEET_NAME = "A1:AB3";
+
+        const fetchData = async () => {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log('API Response:', data); // Log the data to inspect the structure
+
+                if (data.values) {
+                    displayData(data.values[0], data.values[2]);
+                } else {
+                    console.error('No values found in the response');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+};
+
+        const displayData = (col1Data, col2Data) => {
+            const table = document.createElement('table');
+            table.className = 'table table-bordered ml-3';
+
+            const th_first = document.createElement('th')
+            th_first.innerHTML = `Lease Provisions`;
+            table.appendChild(th_first);
+            const th_second = document.createElement('th')
+            th_second.innerHTML = `Verbatim Language (or N/A, if applicable)`;
+            table.appendChild(th_second);
+
+            col1Data.forEach((name, index) => {
+                const tr = document.createElement('tr');
+
+                // First Column: Data from array 0
+                const nameTd = document.createElement('td');
+                nameTd.className = 'col-7';
+                nameTd.innerHTML = `${name}`;
+                tr.appendChild(nameTd);
+
+                // Second Column: Data from array 2
+                const textTd = document.createElement('td');
+                textTd.className = 'col-5';
+                textTd.innerHTML = `${col2Data[index] ? col2Data[index] : 'N/A'}`;
+                tr.appendChild(textTd);
+
+                table.appendChild(tr);
+            });
+
+            document.getElementById('data-display').innerHTML = '';
+            document.getElementById('data-display').appendChild(table);
+        };
+
+        const filterData = () => {
+            const filterDate = document.getElementById('date-filter').value;
+            // Add logic to filter data based on date or other criteria
+        };
+
+        fetchData();
+    </script>
+</body>
+</html>
